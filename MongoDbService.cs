@@ -7,7 +7,7 @@ public class MongoDbService
 
     public MongoDbService()
     {
-        var connectionString = "mongodb://localhost:27017"; // Replace with your connection string
+        var connectionString = "mongodb://localhost:27017/"; // Replace with your connection string
         _client = new MongoClient(connectionString);
         _database = _client.GetDatabase("Users"); 
     }

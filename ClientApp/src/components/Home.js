@@ -11,29 +11,21 @@ export class Home extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    
     handleChange(event) {
         this.setState({ editText: event.target.value });
+        console.log(event.target.value);
     }
-callDummyPostMethod() {
-        fetch('WeatherForecast/WriteToDatabase',{
-            method: 'POST',
-        headers:{'Content-type':'application/json'},
-    body: 'ddddd'}).then(Response=>{
-            if(Response.ok)
-            console.log("asd")
-            else{
-                
-            }
-        }).catch(error=>{
-            console.log(error.toString());
-        });
-
-    }
+    
     handleSubmit(event) {
         event.preventDefault();
-        //fetch('User/saveEditText').then(console.log("sadas")).catch(Error=>{console.log(Error.toString());});        
-        this.callDummyPostMethod();
+        console.log(this.state.editText.editText)
+        fetch('/user/saveEditText', { // Assuming your controller is named 'UserController'
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: "asdasdada" })});
         
+
     }
     
     
@@ -44,6 +36,7 @@ callDummyPostMethod() {
                 <div className="form-wrapper">
                     <form onSubmit={this.handleSubmit}>
                         <input
+                            
                             type="text"
                             value={this.state.editText}
                             onChange={this.handleChange}

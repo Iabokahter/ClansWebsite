@@ -6,7 +6,7 @@ namespace Clans.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly MongoDbService _mongoDbService;
+    private readonly MongoDbService _mongoDbService = new MongoDbService();
 
     private readonly ILogger<UserController> _logger;
 
@@ -17,29 +17,35 @@ public class UserController : ControllerBase
     [HttpGet]
     public IEnumerable<User> Get()
     {
-        return Enumerable.Range(1, 5).Select(index => new User("asdasd")).ToArray();    }
-
-    [HttpPost("saveEditText")] // Ensure correct route
-    public async Task<IActionResult> SaveEditText([FromBody] string text)
-    {
-
-        var collection = _mongoDbService.GetCollection<User>("default");
-        var document = new User(text);
+        var collection = _mongoDbService.GetCollection<User>("Default");
+        var document = new User { Text = "adsasd"};
         string ErrMsg = "";
-        await collection.InsertOneAsync(document).ContinueWith(task =>
+        collection.InsertOneAsync(document).ContinueWith(task =>
         {
             if (!task.IsCompleted)
             {
                 ErrMsg = task.Exception?.Message;
             }
         });
-        if (ErrMsg.Equals(""))
+        
+        return Enumerable.Range(1, 5).Select(index => new User { Text = "adsasd"}).ToArray();
+        
+    }
+
+    [HttpPost("saveEditText")] // Ensure correct route
+    public async Task<IActionResult> SaveEditText([FromBody] string text)
+    {
+        var collection = _mongoDbService.GetCollection<User>("default");
+        var document = new User { Text = text }; // Use the received text
+
+        try
         {
-            return new OkObjectResult("User created");
+            await collection.InsertOneAsync(document);
+            return Ok("User created");  
         }
-        else
+        catch (Exception ex)
         {
-            return new BadRequestObjectResult(ErrMsg);
+            return BadRequest(ex.Message);
         }
     }
 
