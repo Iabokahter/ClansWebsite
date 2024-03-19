@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace Clans.Controllers;
 
@@ -14,11 +17,12 @@ public class UserController : ControllerBase
     {
         _logger = logger;
     }
+
     [HttpGet]
     public IEnumerable<User> Get()
     {
-        var collection = _mongoDbService.GetCollection<User>("Default");
-        var document = new User { Text = "adsasd"};
+        var collection = _mongoDbService.GetCollection<User>("default");
+        var document = new User { Text = "adsasd" };
         string ErrMsg = "";
         collection.InsertOneAsync(document).ContinueWith(task =>
         {
@@ -27,26 +31,56 @@ public class UserController : ControllerBase
                 ErrMsg = task.Exception?.Message;
             }
         });
-        
-        return Enumerable.Range(1, 5).Select(index => new User { Text = "adsasd"}).ToArray();
-        
+
+        return Enumerable.Range(1, 5).Select(index => new User { Text = "adsasd" }).ToArray();
+
     }
-
-    [HttpPost("saveEditText")] // Ensure correct route
-    public async Task<IActionResult> SaveEditText([FromBody] string text)
+    [HttpGet("GetPlayersCount")] // Ensure correct route
+    public async Task<IActionResult> GetPlayersCount()
     {
+        Dictionary<string, int> clansPlayersCount = new Dictionary<string, int>();
         var collection = _mongoDbService.GetCollection<User>("default");
-        var document = new User { Text = text }; // Use the received text
+        foreach (var user in collection.AsQueryable())
+        {
+            if (clansPlayersCount.ContainsKey(user.ClanName ?? "Clan A"))
+            {
+                clansPlayersCount[user.ClanName ?? "Clan A"] += 1;
+            }
+            else
+            {
+                clansPlayersCount[user.ClanName ?? "Clan A"] = 1;
+            }
+        }
+        
+        return Ok(clansPlayersCount);
+    }
+    [HttpPost("saveEditText")] // Ensure correct route
+    public async Task<IActionResult> SaveEditText([FromBody] JsonElement body)
+    {
 
-        try
+        var collection = _mongoDbService.GetCollection<User>("default");
+
+        if (collection.AsQueryable().Any(user => user.Text == body.GetProperty("text").GetString()))
         {
-            await collection.InsertOneAsync(document);
-            return Ok("User created");  
+            return Ok("User exist");
+
         }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
+        else
+        {        
+            var document = new User { Text = body.GetProperty("text").GetString() }; // Use the received text
+
+            try
+            {
+                await collection.InsertOneAsync(document);
+                return Ok("User created");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
+
     }
 
 

@@ -1,0 +1,6 @@
+{
+  "entities": [
+    { "id": 1, "name": "Clan A","initialPoints":100 },
+    { "id": 2, "name": "Clan B" ,"initialPoints":100}
+  ]
+}

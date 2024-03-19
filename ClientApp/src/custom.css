@@ -24,3 +24,17 @@ code {
 .form-wrapper {
   /* You might want additional styles to space the input and button */
 }
+.entities-page-wrapper {
+  position: relative;
+  min-height: 100vh; /* Ensure the wrapper fills the entire viewport */
+
+}
+.indent-button {
+  margin-left: 10px; /* Adjust as needed */
+}
+.name-display {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 10px;
+}
