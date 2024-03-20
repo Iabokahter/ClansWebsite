@@ -12,9 +12,21 @@ function EntitiesPage() {
         fetchNumbers();
     }, []);
     const handleButtonClick = (index) => {
+        fetch('/user/EnterClan',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text:index })}).then(
+                
+        ).then(r =>{
+            if(r.ok){
+                window.location.href = '/ClanPage'
 
-        console.log(JSON.parse(numbers)["Clan A"]);
-    };
+            }
+        });
+
+        };
 
     const fetchNumbers = async () => {
         try {

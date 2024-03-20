@@ -38,3 +38,36 @@ code {
   right: 0;
   margin: 10px;
 }
+.clan-page {
+  display: flex; /* Make the container a flexbox for easier layout */
+  flex-direction: column; /* Stack elements vertically by default */
+  min-height: 100vh; /* Set minimum height to fill viewport */
+  justify-content: space-between; /* Vertically distribute content with space between */
+}
+
+.leave-button-container {
+  position: absolute; /* Position the button absolutely to place it freely */
+  top: 10px; /* Set top margin from the edge */
+  right: 10px; /* Set right margin from the edge */
+}
+.button-container {
+  position: fixed;
+  left: 20px; /* Adjust this value to set the distance from the left side */
+  bottom: 20px; /* Adjust this value to set the distance from the bottom */
+  z-index: 1000; /* Ensure the button appears on top of other content */
+}
+.edit-section {
+  display: flex; /* Make the edit section a flexbox to arrange forms horizontally */
+  flex-direction: row; /* Arrange elements side-by-side */
+  justify-content: center; /* Horizontally center the forms */
+  align-items: center; /* Vertically center the forms */
+  margin-top: auto; /* Push the section down vertically */
+}
+
+.edit-section form {
+  margin-right: 20px; /* Add space between forms */
+}
+
+.edit-section form:last-child {
+  margin-right: 0; /* Remove margin for the last form */
+}

@@ -37,14 +37,8 @@ export class Home extends Component {
         })
             .then(data => {
                 console.log(data); // Log the text response
-                if(data == 'User created'){
+                localStorage.setItem('name', this.state.editText);
 
-                    localStorage.setItem('name', this.state.editText);
-
-                }else{
-                    localStorage.setItem('name', 'Back  ' + this.state.editText );
-
-                }
                 window.location.href = '/ClanBrowserPage'
             })
 
