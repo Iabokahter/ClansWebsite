@@ -1,17 +1,64 @@
-﻿import React, { useState } from 'react';
+﻿import React, {useEffect, useState} from 'react';
+import config from "./config.json";
 
 function ClanPage() {
     const [addPoints, setAddPoints] = useState(0);
     const [subtractPoints, setSubtractPoints] = useState(0);
     const [setPoints, setSetPoints] = useState(0);
 
-    
+    const [ClanName,setClanName] = useState("");
+    const [loggedOut, setLoggedOut] = useState(false);
+
+    useEffect(() => {
+
+
+        const checkSessionID = () => {
+            fetch('/user/GetActiveSession',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username:localStorage.getItem('name') })}).
+            then(r=>{
+                    r.text().then(r=>{
+                            if(r !== localStorage.getItem('sessionID')){
+                                setLoggedOut(true);
+                                console.log('logout!!');
+
+                            }else{
+
+
+                            }
+                        }
+                    )
+                }
+            )
+        };
+        checkSessionID();
+
+        const intervalId = setInterval(checkSessionID, 1000); // Poll every 1 second
+        return () => clearInterval(intervalId);
+
+    }, []);
     const getClanName = ()=>{
-        
+        fetch('/user/GetMyClanName',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username: localStorage.getItem('name') })}).then(r =>{
+            if(r.ok){
+                r.text().then(r=>{
+                    console.log(r);
+                    setClanName(r);
+                    }
+                    
+                )
+            }
+        });
     }
     const handleAddPoints = () => {
-        // Implement adding points logic here
-        console.log("Adding points:", addPoints);
+        
         fetch('/user/AddRemovePoints',{
             method: 'POST',
             headers: {
@@ -32,7 +79,6 @@ function ClanPage() {
 
     };
     const handleSubtractPoints = () => {
-        // Implement subtracting points logic here
         console.log("Subtracting points:", subtractPoints);
         let subtraction  = -subtractPoints;
 
@@ -84,8 +130,7 @@ function ClanPage() {
             }
         });
     };
-
-    let ClanName;
+    getClanName();
     return (
         <div>
             <button style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={handleLeaveClan}>Leave the Clan</button>
@@ -118,7 +163,13 @@ function ClanPage() {
                 </div>
             </div>
             <button className="button-container" onClick={handleShowClanContribution}>Show clan contribution </button>
-
+            {loggedOut && (
+                <div className="loading-overlay">
+                    <h1 style={{ color: 'white' }}>Logged Out...</h1>
+                    <button  onClick={() =>                 window.location.href = '/'
+                    }>BackToLogin</button>
+                </div>
+            )}
         </div>
     );
 }

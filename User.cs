@@ -10,5 +10,7 @@ public class User
     public bool InClan { get; set; } = false;
     public int ClanPoints { get; set; } = 0;
 
+    public string sessionID { get; set; }
+    
 
 }

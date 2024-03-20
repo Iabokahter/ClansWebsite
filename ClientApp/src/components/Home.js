@@ -6,19 +6,24 @@ export class Home extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { editText: '' };
+        this.state = {
+            editText: '',
+            isLoading: false // Initialize isLoading state
+        };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-    handleChange(event) {
-        this.setState({editText: event.target.value});
-    }
-    
-    handleSubmit(event) {
 
+    handleChange(event) {
+        this.setState({ editText: event.target.value });
+    }
+
+    handleSubmit(event) {
         event.preventDefault();
-        console.log(this.state.editText)
+        this.setState({ isLoading: true }); // Set isLoading to true to show loading overlay
+        console.log(this.state.editText);
+
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -27,51 +32,62 @@ export class Home extends Component {
             body: JSON.stringify({ text: this.state.editText })
         };
 
-        let user =fetch('/user/saveEditText', requestOptions)
+        fetch('/user/saveEditText', requestOptions)
             .then((response) => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text(); // Return response as text
-                
-        })
-            .then(data => {
-                console.log(data); // Log the text response
-                localStorage.setItem('name', this.state.editText);
-
-                window.location.href = '/ClanBrowserPage'
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
             })
+            .then(data => {
 
-            
+                localStorage.setItem('name', this.state.editText);
+                localStorage.setItem('sessionID', data.split('/')[1]);
+                console.log(data.split('/')[0]);
+                if(data.includes('User exist')) {
+                    window.location.href = '/ClanPage';
+                    
+
+                }else{
+                    window.location.href = '/ClanBrowserPage';
+
+                }
+            })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
+            })
+            .finally(() => {
+                this.setState({ isLoading: false }); 
             });
-    
-
     }
-    
-    
-    render() {
-        let  user = this.state;
 
+    render() {
         return (
             <div className="landing-page-container">
-                
                 <h1>Your Landing Page Title</h1>
                 <div className="form-wrapper">
                     <form onSubmit={this.handleSubmit}>
                         <input
-                            
                             type="text"
                             value={this.state.editText}
                             onChange={this.handleChange}
                             placeholder="Enter your text here"
                         />
-                        <button type="submit">Submit</button>
+                        <button type="submit">
+                            {this.state.isLoading ? 'Loading...' : 'Submit'}
+                        </button>
                     </form>
+                    {this.state.isLoading && (
+                        <div className="loading-overlay">
+                            <div className="spinner"></div> {this.state.isLoading && (
+                            <div className="loading-overlay">
+                                <h1 style={{ color: 'white' }}>Loading...</h1>
+                            </div>
+                        )}
+                        </div>
+                    )}
                 </div>
             </div>
         );
-    
     }
 }

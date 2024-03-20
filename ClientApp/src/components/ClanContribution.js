@@ -2,9 +2,38 @@
 
 function PlayersPage() {
     const [players, setPlayers] = useState([]);
+    const [loggedOut, setLoggedOut] = useState(false);
 
     useEffect(() => {
         fetchPlayers();
+
+
+        const checkSessionID = () => {
+            fetch('/user/GetActiveSession',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username:localStorage.getItem('name') })}).
+            then(r=>{
+                    r.text().then(r=>{
+                            if(r !== localStorage.getItem('sessionID')){
+                                setLoggedOut(true);
+                                console.log('logout!!');
+
+                            }else{
+
+
+                            }
+                        }
+                    )
+                }
+            )
+        };
+        checkSessionID();
+
+        const intervalId = setInterval(checkSessionID, 1000);
+        return () => clearInterval(intervalId);
     }, []);
 
     const fetchPlayers = async () => {
@@ -46,14 +75,20 @@ function PlayersPage() {
                 <tbody>
                 {players.map((player, index) => (
                     <tr key={index}>
-                        <td>{player.text}</td>
+                        <td>{player.text + (player.inClan ? '' : ' (left the clan)')}</td>
                         <td>{player.clanPoints}</td>
                     </tr>
                 ))}
                 </tbody>
             </table>
             <button className="button-container" onClick={BackToClanPage}>Back to current clan </button>
-
+            {loggedOut && (
+                <div className="loading-overlay">
+                    <h1 style={{ color: 'white' }}>Logged Out...</h1>
+                    <button  onClick={() =>                 window.location.href = '/'
+                    }>BackToLogin</button>
+                </div>
+            )}
         </div>
     );
 }
